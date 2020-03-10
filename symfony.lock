@@ -96,11 +96,29 @@
     "fzaninotto/faker": {
         "version": "v1.9.1"
     },
+    "guzzlehttp/guzzle": {
+        "version": "6.5.2"
+    },
+    "guzzlehttp/promises": {
+        "version": "v1.3.1"
+    },
+    "guzzlehttp/psr7": {
+        "version": "1.6.1"
+    },
     "jdorn/sql-formatter": {
         "version": "v1.2.17"
     },
     "jwage/purl": {
         "version": "v1.0.0"
+    },
+    "knpuniversity/oauth2-client-bundle": {
+        "version": "1.20",
+        "recipe": {
+            "repo": "github.com/symfony/recipes-contrib",
+            "branch": "master",
+            "version": "1.20",
+            "ref": "80acc9223a205cbf5d9828fd616c82a374d281dd"
+        }
     },
     "league/flysystem": {
         "version": "1.0.64"
@@ -113,6 +131,15 @@
             "version": "1.0",
             "ref": "8ad3ded1f39fedce098e43259741f42092a1010e"
         }
+    },
+    "league/oauth2-client": {
+        "version": "2.4.1"
+    },
+    "league/oauth2-facebook": {
+        "version": "2.0.1"
+    },
+    "league/oauth2-google": {
+        "version": "3.0.2"
     },
     "moneyphp/money": {
         "version": "v3.3.0"
@@ -151,8 +178,14 @@
     "psr/event-dispatcher": {
         "version": "1.0.0"
     },
+    "psr/http-message": {
+        "version": "1.0.1"
+    },
     "psr/log": {
         "version": "1.1.2"
+    },
+    "ralouphie/getallheaders": {
+        "version": "3.0.3"
     },
     "sebastian/comparator": {
         "version": "3.0.2"
