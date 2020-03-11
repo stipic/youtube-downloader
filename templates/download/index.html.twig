@@ -1,0 +1,107 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello DownloadController!{% endblock %}
+
+{% block body %}
+
+<div class="container">
+    <div class="row">
+        <div class="col col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+            <div class="ui-block responsive-flex">
+                <div class="ui-block-title">
+                    <div class="h6 title">Preuzimanja na čekanju <a href="{{ path('onHold') }}">({{ onHold }})</a> | Završena preuzimanja ({{ finished }}) | Neuspješno ({{ failed }})</div>
+                    <div class="h6 title">Broj preuzimanja na listi prije tvog prvog preuzimanja ({{ waitUntilFirst }})</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+	<div class="row">
+
+        <div class="col col-md-6 col-sm-12">
+			<div class="ui-block">
+				<div class="ui-block-title">
+					<h6 class="title">Pokreni download playliste</h6>
+				</div>
+				<div class="ui-block-content">					
+					<form action="/download-playlist" method="POST">
+						<div class="row">
+							<div class="col col-md-12 col-sm-12">
+								<div class="form-group label-floating">
+									<label class="control-label">Youtube URL</label>
+									<input class="form-control" name="playlist" placeholder="" type="text">
+								</div>
+							</div>
+					
+							<div class="col col-md-12 col-sm-12">
+								<button class="btn btn-primary btn-lg full-width">Pokreni preuzimanje</button>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+
+		<div class="col col-md-6 col-sm-12">
+			<div class="ui-block">
+				<div class="ui-block-title">
+					<h6 class="title">Pokreni download jedne pjesme</h6>
+				</div>
+				<div class="ui-block-content">					
+					<form action="/download-single-song" method="POST">
+						<div class="row">
+							<div class="col col-md-12 col-sm-12">
+								<div class="form-group label-floating">
+									<label class="control-label">Youtube URL</label>
+									<input class="form-control" name="url" placeholder="" type="text">
+								</div>
+							</div>
+					
+							<div class="col col-md-12 col-sm-12">
+								<button class="btn btn-primary btn-lg full-width">Pokreni preuzimanje</button>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+
+	</div>
+
+    <div class="row">
+
+        <div class="col col-md-12">
+			<div class="ui-block">
+				<div class="ui-block-title">
+					<h6 class="title">Pretplati se na kanal i preuzimaj periodično pjesme</h6>
+				</div>
+				<div class="ui-block-content">					
+					<form action="/channel/subscribe" method="POST">
+						<div class="row">
+							<div class="col col-md-12 col-sm-12">
+								<div class="form-group label-floating">
+									<label class="control-label">Youtube URL</label>
+									<input class="form-control" placeholder="" type="text" name="channel">
+								</div>
+							</div>
+					
+							<div class="col col-md-12 col-sm-12">
+								<button class="btn btn-primary btn-lg full-width">Pretplati se</button>
+							</div>
+						</div>
+					</form>
+
+                    <h6 class="title">Lista kanala s koje periodično downloadam</h6>
+                    
+                    {% for channel in app.user.channels %}
+                        <div><h4>{{ channel.title }}</h4></div>
+                    {% endfor %}
+				</div>
+			</div>
+		</div>
+    </div>
+</div>
+
+{% endblock %}

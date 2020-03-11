@@ -38,6 +38,16 @@ class Song
      */
     private $users;
 
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $size;
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $duration;
+
     public function __construct()
     {
         $this->users = new ArrayCollection();
@@ -108,6 +118,30 @@ class Song
             $this->users->removeElement($user);
             $user->removeSong($this);
         }
+
+        return $this;
+    }
+
+    public function getSize(): ?int
+    {
+        return $this->size;
+    }
+
+    public function setSize(int $size): self
+    {
+        $this->size = $size;
+
+        return $this;
+    }
+
+    public function getDuration(): ?int
+    {
+        return $this->duration;
+    }
+
+    public function setDuration(int $duration): self
+    {
+        $this->duration = $duration;
 
         return $this;
     }

@@ -33,6 +33,11 @@ class Channel
      */
     private $subscribers;
 
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $videos;
+
     public function __construct()
     {
         $this->subscribers = new ArrayCollection();
@@ -89,6 +94,18 @@ class Channel
         if ($this->subscribers->contains($subscriber)) {
             $this->subscribers->removeElement($subscriber);
         }
+
+        return $this;
+    }
+
+    public function getVideos(): ?string
+    {
+        return $this->videos;
+    }
+
+    public function setVideos(string $videos): self
+    {
+        $this->videos = $videos;
 
         return $this;
     }

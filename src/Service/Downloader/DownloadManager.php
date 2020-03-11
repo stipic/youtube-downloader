@@ -2,6 +2,7 @@
 namespace App\Service\Downloader;
 
 use App\Entity\Song;
+use App\Entity\Queue;
 use App\Repository\SongRepository;
 use App\Service\Downloader\YoutubeAPI;
 use App\Service\Message\DownloadMessage;
@@ -46,11 +47,27 @@ class DownloadManager
         $this->_youtubeHelper = $ytApi;
     }
 
-    public function addToDownloadQueue($url, $video = null)
+    public function addPlaylistToDownloadQueue($videos, $user = null)
+    {
+        foreach($videos as $ytSong)
+        {
+            $url = 'https://www.youtube.com/watch?v=' . $ytSong->snippet->resourceId->videoId;
+            $this->addToDownloadQueue($url, $ytSong, $user); 
+        }
+        
+        return; //@todo vrati nešto
+    }
+
+    public function addToDownloadQueue($url, $video = null, $user = null)
     {
         $videoId = $this->_youtubeHelper->getId($url);
         $song = $this->_songRepo->findOneBy(['ytId' => $videoId]);
-        $user = $this->_tokenStorage->getToken()->getUser();
+
+        if($user == null)
+        {
+            $user = $this->_tokenStorage->getToken()->getUser();
+        }
+        
         if($song instanceof Song)
         {
             // Pjesma postoji, attachaj ju na usera.
@@ -67,6 +84,7 @@ class DownloadManager
 
             $ytVideoId = isset($video->snippet->resourceId->videoId) ? $video->snippet->resourceId->videoId : false;
             $ytVideoTitle = isset($video->snippet->title) ? $video->snippet->title : false;
+            // $ytVideoDuration = $video->snippet->duration;
             if($video == null)
             {
                 // u pitanju je single song download.
@@ -80,10 +98,24 @@ class DownloadManager
             if($ytVideoId == $videoId && $ytVideoTitle != false)
             {
                 $rootDir = $this->_appKernel->getProjectDir();
-                $safeFilename = \App\Controller\HomeController::normalizeString($video->snippet->title);
+                $safeFilename = self::normalizeString($video->snippet->title);
                 $location = $rootDir . '/public/storage/' . $safeFilename . '.mp3';
+                $videoInfo = json_encode($video);
 
-                $message = new DownloadMessage($url, $videoId, $video, $location, $user->getId());
+                $queue = new Queue();
+                $queue->setYoutubeInfo($videoInfo);
+                $queue->setUrl($url);
+                $queue->setVideoId($videoId);
+                $queue->setLocation($location);
+                $queue->setUser($user);
+                $queue->setFinished(0);
+                $queue->setStatus(0); // on hold
+                $queue->setCreatedAt(new \DateTime('now'));
+
+                $this->_em->persist($queue);
+                $this->_em->flush();
+
+                $message = new DownloadMessage($queue->getId());
                 $envelope = new Envelope($message);
                 $this->_bus->dispatch(
                     $envelope->with(
@@ -98,5 +130,20 @@ class DownloadManager
         }
 
         return; //@todo daj neki status.
+    }
+
+    public static function normalizeString($str = '')
+    {
+        $str = strip_tags($str); 
+        $str = preg_replace('/[\r\n\t ]+/', ' ', $str);
+        $str = preg_replace('/[\"\*\/\:\<\>\?\'\|]+/', ' ', $str);
+        $str = strtolower($str);
+        $str = html_entity_decode( $str, ENT_QUOTES, "utf-8" );
+        $str = htmlentities($str, ENT_QUOTES, "utf-8");
+        $str = preg_replace("/(&)([a-z])([a-z]+;)/i", '$2', $str);
+        $str = str_replace(' ', '-', $str);
+        $str = rawurlencode($str);
+        $str = str_replace('%', '-', $str);
+        return $str;
     }
 }

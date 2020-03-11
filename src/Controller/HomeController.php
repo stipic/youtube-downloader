@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Channel;
 use App\Entity\Song;
 use App\Repository\ChannelRepository;
+use App\Repository\QueueRepository;
 use App\Repository\SongRepository;
 use App\Service\Downloader\DownloadManager;
 use App\Service\Downloader\YoutubeAPI;
@@ -36,10 +37,38 @@ class HomeController extends AbstractController
     /**
      * @Route("/", name="home")
      */
-    public function index()
+    public function index(
+        QueueRepository $queueRepo
+    )
     {
+        //@todo izračunati koliko je queue-ava ISPRED tvog prvog na redu.
+
+        $onHold = $queueRepo->findBy([
+            'user' => $this->getUser()->getId(),
+            'finished' => 0,
+            'status' => 0
+        ]);
+
+        $finished = $queueRepo->findBy([
+            'user' => $this->getUser()->getId(),
+            'finished' => 1,
+            'status' => 1
+        ]);
+
+        $failed = $queueRepo->findBy([
+            'user' => $this->getUser()->getId(),
+            'status' => 2
+        ]);
+
+        $onHoldBefore = $queueRepo->findQueueNumber($this->getUser()->getId());
+
         // dashboard.
-        return $this->render('home/index.html.twig', []);
+        return $this->render('home/index.html.twig', [
+            'onHold' => count($onHold),
+            'finished' => count($finished),
+            'failed' => count($failed),
+            'waitUntilFirst' => (int) $onHoldBefore['num']
+        ]);
     }
 
     /**
@@ -48,7 +77,8 @@ class HomeController extends AbstractController
     public function channelSubscribe(
         Request $request,
         EntityManagerInterface $em,
-        ChannelRepository $channelRepository
+        ChannelRepository $channelRepository,
+        DownloadManager $downloadManager
     )
     {
         $channelUrl = $request->get('channel');
@@ -58,6 +88,8 @@ class HomeController extends AbstractController
         if(isset($channel->id))
         {
             $dbChannel = $channelRepository->findOneBy(['ytId' => $channel->id]);
+            $playlistId = $channel->contentDetails->relatedPlaylists->uploads;
+
             if(!$dbChannel instanceof Channel)
             {
                 // Kanal ne postoj, kreiraj ga i attachaj usera.
@@ -66,6 +98,7 @@ class HomeController extends AbstractController
                 $xChannel->setYtId($channel->id);
                 $xChannel->setTitle($channel->snippet->title);
                 $xChannel->addSubscriber($user);
+                $xChannel->setVideos($playlistId);
 
                 $user->addChannel($xChannel);
                 $em->persist($xChannel);
@@ -82,6 +115,9 @@ class HomeController extends AbstractController
             }
 
             $em->flush();
+
+            $videos = $this->_youtubeHelper->getPlaylistVideos($playlistId);
+            $downloadManager->addPlaylistToDownloadQueue($videos);
         }
 
         return new RedirectResponse($this->generateUrl('home'));
@@ -99,12 +135,9 @@ class HomeController extends AbstractController
         
         $vid = $request->get('playlist');
         $playlistId = $this->_youtubeHelper->getPlaylistId($vid);
-        $playlist = $this->_youtube->getPlaylistItemsByPlaylistId($playlistId);
-        foreach($playlist as $ytSong)
-        {
-            $url = 'https://www.youtube.com/watch?v=' . $ytSong->snippet->resourceId->videoId;
-            $downloadManager->addToDownloadQueue($url, $ytSong); 
-        }
+        $videos = $this->_youtubeHelper->getPlaylistVideos($playlistId);
+
+        $downloadManager->addPlaylistToDownloadQueue($videos);
 
         return new RedirectResponse($this->generateUrl('home'));
     }
@@ -123,20 +156,5 @@ class HomeController extends AbstractController
         $downloadManager->addToDownloadQueue($vid);
 
         return new RedirectResponse($this->generateUrl('home'));
-    }
-
-    public static function normalizeString($str = '')
-    {
-        $str = strip_tags($str); 
-        $str = preg_replace('/[\r\n\t ]+/', ' ', $str);
-        $str = preg_replace('/[\"\*\/\:\<\>\?\'\|]+/', ' ', $str);
-        $str = strtolower($str);
-        $str = html_entity_decode( $str, ENT_QUOTES, "utf-8" );
-        $str = htmlentities($str, ENT_QUOTES, "utf-8");
-        $str = preg_replace("/(&)([a-z])([a-z]+;)/i", '$2', $str);
-        $str = str_replace(' ', '-', $str);
-        $str = rawurlencode($str);
-        $str = str_replace('%', '-', $str);
-        return $str;
     }
 }

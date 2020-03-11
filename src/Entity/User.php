@@ -49,10 +49,16 @@ class User implements UserInterface
      */
     private $channels;
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Queue", mappedBy="user")
+     */
+    private $queues;
+
     public function __construct()
     {
         $this->songs = new ArrayCollection();
         $this->channels = new ArrayCollection();
+        $this->queues = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -194,6 +200,37 @@ class User implements UserInterface
         if ($this->channels->contains($channel)) {
             $this->channels->removeElement($channel);
             $channel->removeSubscriber($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Queue[]
+     */
+    public function getQueues(): Collection
+    {
+        return $this->queues;
+    }
+
+    public function addQueue(Queue $queue): self
+    {
+        if (!$this->queues->contains($queue)) {
+            $this->queues[] = $queue;
+            $queue->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeQueue(Queue $queue): self
+    {
+        if ($this->queues->contains($queue)) {
+            $this->queues->removeElement($queue);
+            // set the owning side to null (unless already changed)
+            if ($queue->getUser() === $this) {
+                $queue->setUser(null);
+            }
         }
 
         return $this;

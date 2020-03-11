@@ -7,6 +7,8 @@ class YoutubeAPI
 {
     private $_youtube;
 
+    private $_videos = [];
+
     public function __construct()
     {
         $apiKey = $_ENV['YT_API_KEY'];
@@ -14,6 +16,34 @@ class YoutubeAPI
             'key' => $apiKey,
             'referer' => '212.91.114.82'
         ]);
+    }
+
+    public function getPlaylistVideos($playlistId, $pageToken = null)
+    {
+        $config = [
+            'playlistId' => $playlistId,
+            'part' => 'id, snippet, contentDetails, status',
+            'maxResults' => 50 // to je max
+        ];
+        
+        if($pageToken != null)
+        {
+            $config['pageToken'] = $pageToken;
+        }
+
+        $playlist = $this->_youtube->getPlaylistItemsByPlaylistIdAdvanced($config, TRUE);
+
+        $this->_videos = array_merge($playlist['results'], $this->_videos);
+
+        if(count($this->_videos) < $playlist['info']['totalResults'])
+        {
+            $nextPageToken = $playlist['info']['nextPageToken'];
+            $this->getPlaylistVideos($playlistId, $nextPageToken);
+        }
+
+        //@todo AKO uleti neka OGROMNA playlista od 1000+ videa treba handleati to da ne spamam yt api zbog quote limita.
+
+        return $this->_videos;
     }
 
     public function getClient()

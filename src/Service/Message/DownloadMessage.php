@@ -8,65 +8,17 @@ class DownloadMessage
     /**
      * @Groups({"data"})
      */
-    private $_youtubeInfo;
-
-    /**
-     * @Groups({"data"})
-     */
-    private $_url;
-
-    /**
-     * @Groups({"data"})
-     */
-    private $_videoId;
-
-    /**
-     * @Groups({"data"})
-     */
-    private $_location;
-
-    /**
-     * @Groups({"data"})
-     */
-    private $_userId;
+    private $_queueId;
 
     public function __construct(
-        $url = null, 
-        $videoId = null, 
-        $youtubeInfo = null, 
-        $location = null,
-        $userId = null
+        $queueId = null
     )
     {
-        $this->_youtubeInfo = $youtubeInfo;
-        $this->_url = $url;
-        $this->_videoId = $videoId;
-        $this->_location = $location;
-        $this->_userId = $userId;
-    }
-    
-    public function getYoutubeInfo()
-    {
-        return $this->_youtubeInfo;
+        $this->_queueId = $queueId;
     }
 
-    public function getUrl()
+    public function getQueueId()
     {
-        return $this->_url;
-    }
-
-    public function getVideoId()
-    {
-        return $this->_videoId;
-    }
-
-    public function getLocation()
-    {
-        return $this->_location;
-    }
-
-    public function getUserId()
-    {
-        return $this->_userId;
+        return $this->_queueId;
     }
 }
