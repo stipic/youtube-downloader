@@ -48,6 +48,11 @@ class Song
      */
     private $duration;
 
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $thumb;
+
     public function __construct()
     {
         $this->users = new ArrayCollection();
@@ -142,6 +147,18 @@ class Song
     public function setDuration(int $duration): self
     {
         $this->duration = $duration;
+
+        return $this;
+    }
+
+    public function getThumb(): ?string
+    {
+        return $this->thumb;
+    }
+
+    public function setThumb(string $thumb): self
+    {
+        $this->thumb = $thumb;
 
         return $this;
     }

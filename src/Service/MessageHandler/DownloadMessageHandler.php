@@ -58,6 +58,7 @@ class DownloadMessageHandler implements MessageHandlerInterface
             $videoId = $queue->getVideoId();
             $video = $queue->getYoutubeInfo();
             $user = $queue->getUser();
+            $thumbUrl = $queue->getThumb();
 
             $video = json_decode($video);
             $rootDir = $this->_appKernel->getProjectDir() . '/public';
@@ -91,7 +92,17 @@ class DownloadMessageHandler implements MessageHandlerInterface
                 {
                     $dbPath = str_replace($rootDir, '', $location);
                     $size = \filesize($location);
+
                     $ytVideoDuration = isset($video->contentDetails->duration) ? self::ISO8601ToSeconds($video->contentDetails->duration) : 0;
+                    if($ytVideoDuration == 0)
+                    {
+                        // ffmpeg pomozi :D
+
+                        $time = exec("ffmpeg -i " . escapeshellarg($location) . " 2>&1 | grep 'Duration' | cut -d ' ' -f 4 | sed s/,//");
+                        list($hms, $milli) = explode('.', $time);
+                        list($hours, $minutes, $seconds) = explode(':', $hms);
+                        $ytVideoDuration = ($hours * 3600) + ($minutes * 60) + $seconds;
+                    }
 
                     $song = new Song();
                     $song->setYtId($videoId);
@@ -100,6 +111,8 @@ class DownloadMessageHandler implements MessageHandlerInterface
                     $song->addUser($user);
                     $song->setSize($size);
                     $song->setDuration($ytVideoDuration);
+                    $song->setThumb($thumbUrl);
+                    
                     $user->addSong($song);
 
                     $this->_em->persist($song);
@@ -113,13 +126,13 @@ class DownloadMessageHandler implements MessageHandlerInterface
                     $queue->setStatus(2); // error
                 }
 
-                $queue->setFinished(1);
-                $queue->setFinishedAt(new \DateTime('now'));
-                $this->_em->flush();
-
                 echo "\n\r" . $url . ' DOWNLOAD FINISH!';
 
             } // else = VIDEO VEĆ POSTOJI.
+
+            $queue->setFinished(1);
+            $queue->setFinishedAt(new \DateTime('now'));
+            $this->_em->flush();
         }
     }
 

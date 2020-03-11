@@ -25,7 +25,7 @@
                         
                         <li class="js-open-popup" data-popup-target=".playlist-popup">
                             <div class="playlist-thumb">
-                                <img src="img/playlist6.jpg" alt="thumb-composition">
+                                <img src="{{ song.thumb }}" alt="thumb-composition">
                                 <div class="overlay"></div>
                                 <a href="#" class="play-icon">
                                     <svg class="olymp-music-play-icon-big">
@@ -66,38 +66,4 @@
 	</div>
 </div>
 
-<p>Preuzimanja na čekanju: {{ onHold }} - LISTA PREUZIMANJA PRIJE TEBE: {{ waitUntilFirst }}</p> 
-<p>Završena preuzimanja: {{ finished }}</p>
-<p>Failed: {{ failed }}</p>
-
-<form action="/download-single-song" method="POST">
-    <label>Download jedne pjesme</label>
-    <input type="text" name="url" placeholder="Unesi youtube URL" />
-    <button type="submit">Download</button>
-</form>
-
-<form action="/download-playlist" method="POST">
-    <label>Download cijele playliste</label>
-    <input type="text" name="playlist" placeholder="Unesi youtube playlist URL" />
-    <button type="submit">Download playlist</button>
-</form>
-
-<form action="/channel/subscribe" method="POST">
-    <label>Subscribe na kanal</label>
-    <input type="text" name="channel" placeholder="Unesi youtube channel URL" />
-    <button type="submit">Subscribe</button>
-</form>
-
-
-<a href="">
-    Logout
-</a>
-
-<h1>Songs</h1>
-
-<h1>Subscribed to:</h1>
-{% for channel in app.user.channels %}
-    <hr>
-    <h4>{{ channel.title }}</h4>
-{% endfor %}
 {% endblock %}

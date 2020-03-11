@@ -62,6 +62,11 @@ class Queue
      */
     private $status;
 
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $thumb;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -171,6 +176,18 @@ class Queue
     public function setStatus(int $status): self
     {
         $this->status = $status;
+
+        return $this;
+    }
+
+    public function getThumb(): ?string
+    {
+        return $this->thumb;
+    }
+
+    public function setThumb(string $thumb): self
+    {
+        $this->thumb = $thumb;
 
         return $this;
     }

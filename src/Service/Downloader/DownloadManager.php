@@ -84,6 +84,12 @@ class DownloadManager
 
             $ytVideoId = isset($video->snippet->resourceId->videoId) ? $video->snippet->resourceId->videoId : false;
             $ytVideoTitle = isset($video->snippet->title) ? $video->snippet->title : false;
+            $ytThumb = isset($video->snippet->thumbnails->standard->url) ? $video->snippet->thumbnails->standard->url : '';
+            if($ytThumb == '')
+            {
+                $ytThumb = isset($video->snippet->thumbnails->default->url) ? $video->snippet->thumbnails->default->url : '';
+            }
+            
             // $ytVideoDuration = $video->snippet->duration;
             if($video == null)
             {
@@ -93,6 +99,7 @@ class DownloadManager
 
                 $ytVideoId = isset($video->id) ? $video->id : false;
                 $ytVideoTitle = isset($video->snippet->title) ? $video->snippet->title : false;
+                $ytThumb = isset($video->snippet->thumbnails->standard->url) ? $video->snippet->thumbnails->standard->url : $video->snippet->thumbnails->default->url;
             }
 
             if($ytVideoId == $videoId && $ytVideoTitle != false)
@@ -110,6 +117,7 @@ class DownloadManager
                 $queue->setUser($user);
                 $queue->setFinished(0);
                 $queue->setStatus(0); // on hold
+                $queue->setThumb($ytThumb);
                 $queue->setCreatedAt(new \DateTime('now'));
 
                 $this->_em->persist($queue);
