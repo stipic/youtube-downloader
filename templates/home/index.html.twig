@@ -4,11 +4,41 @@
 
 {% block body %}
 
-<form>
-    <input type="text" placeholder="Unesi youtube URL" />
+<form action="/download-single-song" method="POST">
+    <label>Download jedne pjesme</label>
+    <input type="text" name="url" placeholder="Unesi youtube URL" />
+    <button type="submit">Download</button>
 </form>
+
+<form action="/download-playlist" method="POST">
+    <label>Download cijele playliste</label>
+    <input type="text" name="playlist" placeholder="Unesi youtube playlist URL" />
+    <button type="submit">Download playlist</button>
+</form>
+
+<form action="/channel/subscribe" method="POST">
+    <label>Subscribe na kanal</label>
+    <input type="text" name="channel" placeholder="Unesi youtube channel URL" />
+    <button type="submit">Subscribe</button>
+</form>
+
+
 <a href="{{ path('logout') }}">
     Logout
 </a>
 
+<h1>Songs</h1>
+{% for song in app.user.songs %}
+    <hr>
+    <h4>{{ song.title }}</h4>
+    <audio controls>
+        <source src="{{ song.path }}" type="audio/mpeg">
+        Your browser does not support the audio tag.
+    </audio>
+{% endfor %}
+<h1>Subscribed to:</h1>
+{% for channel in app.user.channels %}
+    <hr>
+    <h4>{{ channel.title }}</h4>
+{% endfor %}
 {% endblock %}

@@ -141,6 +141,9 @@
     "league/oauth2-google": {
         "version": "3.0.2"
     },
+    "madcoda/php-youtube-api": {
+        "version": "v1.2.4"
+    },
     "moneyphp/money": {
         "version": "v3.3.0"
     },
@@ -390,6 +393,9 @@
     },
     "symfony/polyfill-php73": {
         "version": "v1.14.0"
+    },
+    "symfony/process": {
+        "version": "v5.0.5"
     },
     "symfony/profiler-pack": {
         "version": "v1.0.4"

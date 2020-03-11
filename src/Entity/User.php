@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -36,6 +38,22 @@ class User implements UserInterface
      * @ORM\Column(type="string", length=255)
      */
     private $username;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\Song", inversedBy="users")
+     */
+    private $songs;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\Channel", mappedBy="subscribers")
+     */
+    private $channels;
+
+    public function __construct()
+    {
+        $this->songs = new ArrayCollection();
+        $this->channels = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -123,6 +141,60 @@ class User implements UserInterface
     public function setUsername(string $username): self
     {
         $this->username = $username;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Song[]
+     */
+    public function getSongs(): Collection
+    {
+        return $this->songs;
+    }
+
+    public function addSong(Song $song): self
+    {
+        if (!$this->songs->contains($song)) {
+            $this->songs[] = $song;
+        }
+
+        return $this;
+    }
+
+    public function removeSong(Song $song): self
+    {
+        if ($this->songs->contains($song)) {
+            $this->songs->removeElement($song);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Channel[]
+     */
+    public function getChannels(): Collection
+    {
+        return $this->channels;
+    }
+
+    public function addChannel(Channel $channel): self
+    {
+        if (!$this->channels->contains($channel)) {
+            $this->channels[] = $channel;
+            $channel->addSubscriber($this);
+        }
+
+        return $this;
+    }
+
+    public function removeChannel(Channel $channel): self
+    {
+        if ($this->channels->contains($channel)) {
+            $this->channels->removeElement($channel);
+            $channel->removeSubscriber($this);
+        }
 
         return $this;
     }
