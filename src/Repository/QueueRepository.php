@@ -22,13 +22,24 @@ class QueueRepository extends ServiceEntityRepository
     // /**
     //  * @return Queue[] Returns an array of Queue objects
     //  */
-    public function findQueueNumber($userId)
+    public function findQueueNumberForUser($userId)
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = 'select COUNT(*) as num from queue where id < (select min(id) from queue where user_id=:user_id and finished=0) and finished=0 LIMIT 1';
         
         $stmt = $conn->prepare($sql);
         $stmt->execute(['user_id' => $userId]);
+
+        return $stmt->fetch();
+    }
+
+    public function findQueueNumberForQueue($queueId)
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = 'select COUNT(*) as num from queue where id < (select min(id) from queue where id=:queueId and finished=0) and finished=0 LIMIT 1';
+        
+        $stmt = $conn->prepare($sql);
+        $stmt->execute(['queueId' => $queueId]);
 
         return $stmt->fetch();
     }

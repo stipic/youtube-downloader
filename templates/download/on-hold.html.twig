@@ -6,11 +6,19 @@
 
 <div class="container">
 	<div class="row">
-
-        <div class="col col-md-6 col-sm-12">
-s
+		<div class="col col-md-6 col-sm-12">
+			<ul>
+				{% for hold in onHold %}
+					<li>
+						URL: <a href="{{ hold.url }}" target="_blank">{{ hold.url }}</a><br />
+						Kreirano: {{ hold.createdAt | date('d.m.Y H:i:s') }}<br />
+						Na redu ZA: {{ hold.id | onHoldOrder }}
+					</li>
+					<hr>
+				{% endfor %}
+			</ul>
 		</div>
-    </div>
+	</div>
 </div>
 
 {% endblock %}

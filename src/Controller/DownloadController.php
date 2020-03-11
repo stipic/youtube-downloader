@@ -34,7 +34,7 @@ class DownloadController extends AbstractController
             'status' => 2
         ]);
 
-        $onHoldBefore = $queueRepo->findQueueNumber($this->getUser()->getId());
+        $onHoldBefore = $queueRepo->findQueueNumberForUser($this->getUser()->getId());
 
         // dashboard.
         return $this->render('download/index.html.twig', [

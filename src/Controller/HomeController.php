@@ -60,7 +60,7 @@ class HomeController extends AbstractController
             'status' => 2
         ]);
 
-        $onHoldBefore = $queueRepo->findQueueNumber($this->getUser()->getId());
+        $onHoldBefore = $queueRepo->findQueueNumberForUser($this->getUser()->getId());
 
         // dashboard.
         return $this->render('home/index.html.twig', [
