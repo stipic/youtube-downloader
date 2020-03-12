@@ -1,0 +1,25 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gotova Preuzimanja{% endblock %}
+
+{% block body %}
+
+<div class="container">
+	<div class="row">
+		<div class="col col-md-6 col-sm-12">
+			<ul>
+				{% for finish in finished %}
+					<li>
+						<div><img src="{{ finish.thumb }}" /></div>
+						<h1>{{ finish.youtubeInfo | queueGetTitle }}</h1>
+						URL: <a href="{{ finish.url }}" target="_blank">{{ finish.url }}</a><br />
+                        Preuzeto: {{ finish.finishedAt | date('d.m.Y H:i:s') }}<br />
+					</li>
+					<hr>
+				{% endfor %}
+			</ul>
+		</div>
+	</div>
+</div>
+
+{% endblock %}

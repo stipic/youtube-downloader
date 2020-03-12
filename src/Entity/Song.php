@@ -35,6 +35,10 @@ class Song
 
     /**
      * @ORM\ManyToMany(targetEntity="App\Entity\User", mappedBy="songs")
+     * @ORM\JoinTable(name="user_song",
+     *   joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")},
+     *   inverseJoinColumns={@ORM\JoinColumn(name="song_id", referencedColumnName="id")}
+     * )
      */
     private $users;
 

@@ -41,8 +41,24 @@ class TwigFilters extends AbstractExtension
                 [
                     'is_safe' => ['html'],
                 ]
+            ),
+            new TwigFilter(
+                'queueGetTitle',
+                [
+                    $this,
+                    'TWIG_queueGetTitle',
+                ],
+                [
+                    'is_safe' => ['html'],
+                ]
             )
         ];
+    }
+
+    public function TWIG_queueGetTitle($ytInfo)
+    {
+        $ytInfo = json_decode($ytInfo);
+        return isset($ytInfo->snippet->title) ? $ytInfo->snippet->title : '';
     }
 
     public function TWIG_formatSeconds($seconds)

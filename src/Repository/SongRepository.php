@@ -3,8 +3,9 @@
 namespace App\Repository;
 
 use App\Entity\Song;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use App\Entity\User;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 /**
  * @method Song|null find($id, $lockMode = null, $lockVersion = null)
@@ -22,19 +23,16 @@ class SongRepository extends ServiceEntityRepository
     // /**
     //  * @return Song[] Returns an array of Song objects
     //  */
-    /*
-    public function findByExampleField($value)
+    public function findUserSongs(User $user, $limit = -1)
     {
         return $this->createQueryBuilder('s')
-            ->andWhere('s.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('s.id', 'ASC')
-            ->setMaxResults(10)
+            ->where(':userId MEMBER OF s.users')
+            ->setParameter('userId', $user->getId())
+            ->orderBy('s.id', 'DESC')
+            // ->setMaxResults($limit)
             ->getQuery()
-            ->getResult()
         ;
     }
-    */
 
     /*
     public function findOneBySomeField($value): ?Song

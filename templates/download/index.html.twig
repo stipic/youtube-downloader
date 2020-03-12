@@ -9,7 +9,7 @@
         <div class="col col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
             <div class="ui-block responsive-flex">
                 <div class="ui-block-title">
-                    <div class="h6 title">Preuzimanja na čekanju <a href="{{ path('onHold') }}">({{ onHold }})</a> | Završena preuzimanja ({{ finished }}) | Neuspješno ({{ failed }})</div>
+                    <div class="h6 title">Preuzimanja na čekanju <a href="{{ path('onHold') }}">({{ onHold }})</a> | Završena preuzimanja <a href="{{ path('finishedDownloads') }}">({{ finished }})</a> | Neuspješno <a href="{{ path('failedDownloads') }}">({{ failed }})</a></div>
                     <div class="h6 title">Broj preuzimanja na listi prije tvog prvog preuzimanja ({{ waitUntilFirst }})</div>
                 </div>
             </div>

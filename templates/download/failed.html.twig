@@ -1,0 +1,25 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Neuspješna preuzimanja{% endblock %}
+
+{% block body %}
+
+<div class="container">
+	<div class="row">
+		<div class="col col-md-6 col-sm-12">
+			<ul>
+				{% for fail in failed %}
+					<li>
+						<div><img src="{{ fail.thumb }}" /></div>
+						<h1>{{ fail.youtubeInfo | queueGetTitle }}</h1>
+						URL: <a href="{{ fail.url }}" target="_blank">{{ fail.url }}</a><br />
+                        Pokušano preuzimanje: {{ fail.finishedAt | date('d.m.Y H:i:s') }}<br />
+					</li>
+					<hr>
+				{% endfor %}
+			</ul>
+		</div>
+	</div>
+</div>
+
+{% endblock %}
