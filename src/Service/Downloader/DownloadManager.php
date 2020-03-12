@@ -120,7 +120,7 @@ class DownloadManager
             {
                 $rootDir = $this->_appKernel->getProjectDir();
                 $safeFilename = self::normalizeString($video->snippet->title);
-                $location = $rootDir . '/public/storage/' . $safeFilename . '.mp3';
+                $location = $rootDir . '/public/storage/song/' . date('Y') . '/' . date('m') . '/' . date('d') . '/' . date('H') . '/' . date('i') . '/' . $safeFilename . '.mp3';
                 $videoInfo = json_encode($video);
 
                 $queue = new Queue();
