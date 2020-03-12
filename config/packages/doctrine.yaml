@@ -8,23 +8,33 @@ doctrine:
         #server_version: '5.7'
     orm:
         auto_generate_proxy_classes: '%kernel.debug%'
-        naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
-        auto_mapping: true
+        default_entity_manager: default
+        entity_managers:
+            default:
+                connection: default
+                naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
+                auto_mapping: true
 
-        metadata_cache_driver: 
-            type: pool
-            pool: doctrine.cache.metadata
-        result_cache_driver: 
-            type: pool
-            pool: doctrine.cache.result
-        query_cache_driver: 
-            type: pool
-            pool: doctrine.cache.query
+                second_level_cache:
+                    region_cache_driver:
+                        pool: doctrine.cache.second_level
+                    enabled: true
+                    region_lifetime: 86400
 
-        mappings:
-            App:
-                is_bundle: false
-                type: annotation
-                dir: '%kernel.project_dir%/src/Entity'
-                prefix: 'App\Entity'
-                alias: App
+                metadata_cache_driver: 
+                    type: pool
+                    pool: doctrine.cache.metadata
+                result_cache_driver: 
+                    type: pool
+                    pool: doctrine.cache.result
+                query_cache_driver: 
+                    type: pool
+                    pool: doctrine.cache.query
+
+                mappings:
+                    App:
+                        is_bundle: false
+                        type: annotation
+                        dir: '%kernel.project_dir%/src/Entity'
+                        prefix: 'App\Entity'
+                        alias: App

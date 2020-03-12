@@ -40,7 +40,10 @@ class SongRepository extends ServiceEntityRepository
             $dql->setMaxResults($limit);
         }
         
-        return $dql->orderBy('s.id', 'DESC')->getQuery();
+        
+        $query = $dql->orderBy('s.id', 'DESC')->getQuery();
+        // $query->useResultCache(true, 30); <- mora se napraviti invalidacija ručno. https://www.gregfreeman.io/2012/invalidating-the-result-cache-in-doctrine-symfony2/
+        return $query;
     }
 
     /*
