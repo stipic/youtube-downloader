@@ -4,13 +4,40 @@
 
 {% block body %}
 
+<div class="container">
+    <div class="row">
+        <div class="col col-md-12">
+            <div class="ui-block">
+                <div class="ui-block-title">
+                    <h6 class="title">Tražilica</h6>
+                </div>
+                <div class="ui-block-content">					
+                    <form action="{{ path('song_library_home', {pageNum: 1}) }}" method="GET">
+                        <div class="row">
+                            <div class="col col-md-12 col-sm-12">
+                                <div class="form-group label-floating">
+                                    <label class="control-label">Unesite pojam koji želite pretražiti...</label>
+                                    <input class="form-control" placeholder="" type="text" name="q" value="{{ searchQuery }}">
+                                </div>
+                            </div>
+                    
+                            <div class="col col-md-12 col-sm-12">
+                                <button class="btn btn-primary btn-lg full-width">Traži</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 <div class="container">
 	<div class="row">
 		<div class="col col-md-12">
 			<div class="ui-block">
 				<div class="ui-block-title">
-					<h6 class="title">Pjesme u tvom profilu ({{ totalSongs }})</h6>
+					<h6 class="title">Rezultati ({{ totalSongs }})</h6>
 					<a href="#" class="more">
 							<span class="c-green">
 								<svg class="olymp-remove-playlist-icon"><use xlink:href="/svg-icons/sprites/icons.svg#olymp-remove-playlist-icon"></use></svg>
@@ -65,12 +92,14 @@
 </div>
 
 {% set _currentRoute = app.request.attributes.get('_route') %}
+{% set _currentParams = app.request.query.all %}
+
 {% if lastPage > 1 %}
     <nav>
         <ul class="pagination">
             {% if currentPage > 1 %}
                 <li class="page-item">
-                    <a class="page-link" href="/page/{{ currentPage - 1 }}" aria-label="Previous">
+                    <a class="page-link" href="{{ path('song_library_home', _currentParams|merge({pageNum: currentPage - 1})) }}" aria-label="Previous">
                         <span aria-hidden="true">&laquo;</span>
                         <span class="sr-only">Previous</span>
                     </a>
@@ -78,12 +107,12 @@
             {% endif %}
             {% for i in 1..lastPage %}
                 <li class="page-item {% if i == currentPage %}active{% endif %}">
-                    <a class="page-link" href="/page/{{ i }}">{{ i }}</a>
+                    <a class="page-link" href="{{ path('song_library_home', _currentParams|merge({pageNum: i})) }}">{{ i }}</a>
                 </li>
             {% endfor %}
             {% if currentPage < lastPage %}
                 <li class="page-item">
-                    <a class="page-link" href="/page/{{ currentPage + 1 }}" aria-label="Next">
+                    <a class="page-link" href="{{ path('song_library_home', _currentParams|merge({pageNum: currentPage + 1})) }}" aria-label="Next">
                         <span aria-hidden="true">&raquo;</span>
                         <span class="sr-only">Next</span>
                     </a>

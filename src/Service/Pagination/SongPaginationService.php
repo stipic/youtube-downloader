@@ -21,9 +21,9 @@ class SongPaginationService
         $this->_tokenStorage = $tokenStorageInterface;
     }
 
-    public function paginate(int $limit, int $currentPage): Paginator
+    public function paginate($query, int $limit, int $currentPage): Paginator
     {
-        $query = $this->_songRepo->findUserSongs($this->_tokenStorage->getToken()->getUser());
+        $query = $this->_songRepo->findUserSongs($query, $this->_tokenStorage->getToken()->getUser());
         
         $paginator = new Paginator($query);
         $paginator->setUseOutputWalkers(false);

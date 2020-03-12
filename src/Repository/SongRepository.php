@@ -23,15 +23,24 @@ class SongRepository extends ServiceEntityRepository
     // /**
     //  * @return Song[] Returns an array of Song objects
     //  */
-    public function findUserSongs(User $user, $limit = -1)
+    public function findUserSongs($query, User $user, $limit = -1)
     {
-        return $this->createQueryBuilder('s')
+        $dql = $this->createQueryBuilder('s')
             ->where(':userId MEMBER OF s.users')
-            ->setParameter('userId', $user->getId())
-            ->orderBy('s.id', 'DESC')
-            // ->setMaxResults($limit)
-            ->getQuery()
-        ;
+            ->setParameter('userId', $user->getId());
+
+        if(!empty($query))
+        {
+            $dql->andWhere('s.title LIKE :query');
+            $dql->setParameter('query', '%' . $query . '%');
+        }
+
+        if($limit != -1)
+        {
+            $dql->setMaxResults($limit);
+        }
+        
+        return $dql->orderBy('s.id', 'DESC')->getQuery();
     }
 
     /*
