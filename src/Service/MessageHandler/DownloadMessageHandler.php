@@ -87,7 +87,9 @@ class DownloadMessageHandler implements MessageHandlerInterface
                     $location, 
                     '--audio-quality', 
                     0, 
-                    '--no-playlist'
+                    '--no-playlist',
+                    '--match-filter',
+                    '!is_live'
                 ]);
 
                 $process->setTimeout(180); // MAX. 3 minute.
