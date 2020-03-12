@@ -2,9 +2,10 @@
 
 namespace App\Command;
 
+use App\Entity\Queue;
 use App\Repository\UserRepository;
-use App\Service\Downloader\DownloadManager;
 use App\Service\Downloader\YoutubeAPI;
+use App\Service\Downloader\DownloadManager;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -67,7 +68,7 @@ class SubscriberRefreshDownloadCommand extends Command
         foreach($channels as $channel)
         {
             $videos = $this->_youtube->getPlaylistItemsByPlaylistId($channel['channel']->getVideos());
-            $this->_downloadManager->addPlaylistToDownloadQueue($videos, $channel['user']);
+            $this->_downloadManager->addPlaylistToDownloadQueue($videos, Queue::ADDED_BY_CHANNEL_SUBSCRIBE_CRONJOB, $channel['user']);
         }
 
         $io->success('You have a new command! Now make it your own! Pass --help to see your options.');

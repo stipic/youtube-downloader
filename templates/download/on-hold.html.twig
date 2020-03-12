@@ -14,7 +14,8 @@
 						<h1>{{ hold.youtubeInfo | queueGetTitle }}</h1>
 						URL: <a href="{{ hold.url }}" target="_blank">{{ hold.url }}</a><br />
 						Kreirano: {{ hold.createdAt | date('d.m.Y H:i:s') }}<br />
-						Na redu ZA: {{ hold.id | onHoldOrder }}
+						Na redu ZA: {{ hold.id | onHoldOrder }}<br />
+						Desc: {{ runIndexToDesc(hold) }}
 					</li>
 					<hr>
 				{% endfor %}

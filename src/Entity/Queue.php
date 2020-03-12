@@ -9,6 +9,14 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Queue
 {
+    const ADDED_BY_DOWNLOAD_SINGLE_SONG = 1; // kada korisnik doda u queue download jedne pjesme onda tom queue postavljamo runIndex = ADDED_BY_DOWNLOAD_SINGLE_SONG
+
+    const ADDED_BY_DOWNLOAD_PLAYLIST = 2; // kada korisnik doda u queue download playliste onda tom queue postavljamo runIndex = ADDED_BY_DOWNLOAD_PLAYLIST
+
+    const ADDED_BY_CHANNEL_SUBSCRIBE = 3; // kada korisnik subscribea neki kanal i inicijalno dodavanje pjesama u queue označavamo sa runIndex = ADDED_BY_CHANNEL_SUBSCRIBE
+
+    const ADDED_BY_CHANNEL_SUBSCRIBE_CRONJOB = 4; // cronjob se pokrene svako malo i za svaki subscribeani channel skidamo nove pjesme koje pronađemo i njih označavamo sa = ADDED_BY_CHANNEL_SUBSCRIBE_CRONJOB
+    
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
@@ -66,6 +74,11 @@ class Queue
      * @ORM\Column(type="string", length=255)
      */
     private $thumb;
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $runIndex;
 
     public function getId(): ?int
     {
@@ -188,6 +201,18 @@ class Queue
     public function setThumb(string $thumb): self
     {
         $this->thumb = $thumb;
+
+        return $this;
+    }
+
+    public function getRunIndex(): ?int
+    {
+        return $this->runIndex;
+    }
+
+    public function setRunIndex(int $runIndex): self
+    {
+        $this->runIndex = $runIndex;
 
         return $this;
     }

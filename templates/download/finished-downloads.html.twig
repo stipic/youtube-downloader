@@ -14,6 +14,7 @@
 						<h1>{{ finish.youtubeInfo | queueGetTitle }}</h1>
 						URL: <a href="{{ finish.url }}" target="_blank">{{ finish.url }}</a><br />
                         Preuzeto: {{ finish.finishedAt | date('d.m.Y H:i:s') }}<br />
+						Desc: {{ runIndexToDesc(finish) }}
 					</li>
 					<hr>
 				{% endfor %}

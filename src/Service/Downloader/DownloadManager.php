@@ -3,6 +3,7 @@ namespace App\Service\Downloader;
 
 use App\Entity\Song;
 use App\Entity\Queue;
+use App\Entity\Notification;
 use App\Repository\SongRepository;
 use App\Service\Downloader\YoutubeAPI;
 use App\Service\Message\DownloadMessage;
@@ -10,6 +11,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
+use App\Service\MessageHandler\DownloadMessageHandler;
 use Symfony\Component\Messenger\Stamp\SerializerStamp;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
@@ -47,18 +49,18 @@ class DownloadManager
         $this->_youtubeHelper = $ytApi;
     }
 
-    public function addPlaylistToDownloadQueue($videos, $user = null)
+    public function addPlaylistToDownloadQueue($videos, $runIndex, $user = null)
     {
         foreach($videos as $ytSong)
         {
             $url = 'https://www.youtube.com/watch?v=' . $ytSong->snippet->resourceId->videoId;
-            $this->addToDownloadQueue($url, $ytSong, $user); 
+            $this->addToDownloadQueue($url, $runIndex, $ytSong, $user); 
         }
         
         return; //@todo vrati nešto
     }
 
-    public function addToDownloadQueue($url, $video = null, $user = null)
+    public function addToDownloadQueue($url, $runIndex, $video = null, $user = null)
     {
         $videoId = $this->_youtubeHelper->getId($url);
         $song = $this->_songRepo->findOneBy(['ytId' => $videoId]);
@@ -71,6 +73,18 @@ class DownloadManager
         if($song instanceof Song)
         {
             // Pjesma postoji, attachaj ju na usera.
+
+            $notification = new Notification();
+            $notificationTitle = 'Nova pjesma dodana u profil: ' . $song->getTitle();
+            $notificationDescription = 'Pjesma je uspješno preuzeta i dodana na tvoj profil.';
+            $notificationDescription = 'Pjesma je pronađena na serveru, neki drugi korisnik ju je već preuzeo stoga smo je dodali u tvoj profil. Ova pjesma neće biti vidljiva na listi završenih preuzimanja u tvom profilu.';            
+            // $notificationDescription .= DownloadMessageHandler::runIndexToDesc($runIndex); //@todo nemamo queue ovdje, što sada? kako fino ispisati description? možemo pronaći tuđi queue
+            $notification->setTitle($notificationTitle);
+            $notification->setCreatedAt(new \DateTime('now'));
+            $notification->setUser($user);
+            $notification->setDescription($notificationDescription);
+
+            $this->_em->persist($notification);
 
             $user->addSong($song);
             $song->addUser($user);
@@ -118,6 +132,7 @@ class DownloadManager
                 $queue->setFinished(0);
                 $queue->setStatus(0); // on hold
                 $queue->setThumb($ytThumb);
+                $queue->setRunIndex($runIndex);
                 $queue->setCreatedAt(new \DateTime('now'));
 
                 $this->_em->persist($queue);

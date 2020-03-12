@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Queue;
 use App\Entity\Channel;
 use App\Repository\QueueRepository;
 use App\Repository\ChannelRepository;
@@ -73,7 +74,7 @@ class DownloadController extends AbstractController
             $em->flush();
 
             $videos = $this->_youtubeHelper->getPlaylistVideos($playlistId);
-            $downloadManager->addPlaylistToDownloadQueue($videos);
+            $downloadManager->addPlaylistToDownloadQueue($videos, Queue::ADDED_BY_CHANNEL_SUBSCRIBE);
         }
 
         return new RedirectResponse($this->generateUrl('home'));
@@ -93,7 +94,7 @@ class DownloadController extends AbstractController
         $playlistId = $this->_youtubeHelper->getPlaylistId($vid);
         $videos = $this->_youtubeHelper->getPlaylistVideos($playlistId);
 
-        $downloadManager->addPlaylistToDownloadQueue($videos);
+        $downloadManager->addPlaylistToDownloadQueue($videos, Queue::ADDED_BY_DOWNLOAD_PLAYLIST);
 
         return new RedirectResponse($this->generateUrl('home'));
     }
@@ -109,7 +110,7 @@ class DownloadController extends AbstractController
         // HTTP Request za download YT pjesme (jedne. - ne playliste)
 
         $vid = $request->get('url');
-        $downloadManager->addToDownloadQueue($vid);
+        $downloadManager->addToDownloadQueue($vid, Queue::ADDED_BY_DOWNLOAD_SINGLE_SONG);
 
         return new RedirectResponse($this->generateUrl('home'));
     }

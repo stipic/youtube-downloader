@@ -2,9 +2,10 @@
 
 namespace App\Service\MessageHandler;
 
-use App\Entity\Queue;
 use App\Entity\Song;
 use App\Entity\User;
+use App\Entity\Queue;
+use App\Entity\Notification;
 use App\Repository\SongRepository;
 use App\Repository\UserRepository;
 use App\Repository\QueueRepository;
@@ -59,6 +60,7 @@ class DownloadMessageHandler implements MessageHandlerInterface
             $video = $queue->getYoutubeInfo();
             $user = $queue->getUser();
             $thumbUrl = $queue->getThumb();
+            $runIndex = $queue->getRunIndex();
 
             $video = json_decode($video);
             $rootDir = $this->_appKernel->getProjectDir() . '/public';
@@ -67,6 +69,10 @@ class DownloadMessageHandler implements MessageHandlerInterface
                 'ytId' => $videoId
             ]);
 
+            $notification = new Notification();
+            $notificationTitle = 'Nova pjesma dodana u profil: ' . $video->snippet->title;
+            $notificationDescription = 'Pjesma je uspješno preuzeta i dodana na tvoj profil.';
+            
             if(!$song instanceof Song && $user instanceof User)
             {
                 echo "\n\r" . 'DOWNLOAD STARTED ' . $url;
@@ -120,15 +126,31 @@ class DownloadMessageHandler implements MessageHandlerInterface
 
                     $queue->setStatus(1); // success
                     $this->_em->persist($queue);
+
+                    $notificationDescription = 'Pjesma nije pronađena na serveru, uspješno je preuzeta i spremljena.';
                 } 
                 else // else = ERROR.
                 {
                     $queue->setStatus(2); // error
+                    $notificationTitle = 'Neuspješno dodavanje pjesme u profil ' . $video->snippet->title;
+                    $notificationDescription = 'Server nije uspio preuzeti pjesmu i dodati je u tvoj profil. Može biti puno razloga, jedan od čestih je da je pjesma uklonjena.';
                 }
 
                 echo "\n\r" . $url . ' DOWNLOAD FINISH!';
 
-            } // else = VIDEO VEĆ POSTOJI.
+            }
+            else
+            {
+                $notificationDescription = 'Pjesma je pronađena na serveru, neki drugi korisnik ju je već preuzeo stoga smo je dodali u tvoj profil. Ova pjesma neće biti vidljiva na listi završenih preuzimanja u tvom profilu.';
+            }
+
+            $notificationDescription .= self::runIndexToDesc($queue);
+            $notification->setTitle($notificationTitle);
+            $notification->setCreatedAt(new \DateTime('now'));
+            $notification->setUser($user);
+            $notification->setDescription($notificationDescription);
+
+            $this->_em->persist($notification);
 
             $queue->setFinished(1);
             $queue->setFinishedAt(new \DateTime('now'));
@@ -144,5 +166,44 @@ class DownloadMessageHandler implements MessageHandlerInterface
             ($interval->h * 60 * 60) +
             ($interval->i * 60) +
             $interval->s;
+    }
+
+    public static function runIndexToDesc(Queue $queue)
+    {
+        $runIndex = $queue->getRunIndex();
+        if($runIndex == Queue::ADDED_BY_DOWNLOAD_SINGLE_SONG)
+        {
+            return 'Pjesma se našla u tvom profilu tako što si pokrenuo download single pjesme.';
+        }
+        else if($runIndex == Queue::ADDED_BY_DOWNLOAD_PLAYLIST)
+        {
+            $video = $queue->getYoutubeInfo();
+            $video = json_decode($video);
+            $playlistId = $video->snippet->playlistId;
+            $channelTitle = $video->snippet->channelTitle;
+            $channelId = $video->snippet->channelId;
+
+            return 'Pjesma se našla u tvom profilu tako što si pokrenuo download playliste ' . $playlistId . ' koju je kreirao kanal ' . $channelTitle . ' (' . $channelId . ').';
+        }
+        else if($runIndex == Queue::ADDED_BY_CHANNEL_SUBSCRIBE)
+        {
+            $video = $queue->getYoutubeInfo();
+            $video = json_decode($video);
+            $channelTitle = $video->snippet->channelTitle;
+            $channelId = $video->snippet->channelId;
+
+            return 'Pjesma se našla u tvom profilu tako što napravio pretplatu na kanal ' . $channelTitle . ' (' . $channelId . ') i automatski su se preuzele pjesme s tog kanala.';
+        }
+        else if($runIndex == Queue::ADDED_BY_CHANNEL_SUBSCRIBE_CRONJOB)
+        {
+            $video = $queue->getYoutubeInfo();
+            $video = json_decode($video);
+            $channelTitle = $video->snippet->channelTitle;
+            $channelId = $video->snippet->channelId;
+
+            return 'Pjesma se našla u tvom profilu tako što napravio pretplatu na kanal ' . $channelTitle . ' (' . $channelId . ') i server nakon nekog vremena dohvaća nove pjesme s tog kanala i automatski ih preuzima i dodaje u tvoj profil.';
+        }
+
+        return '#nepoznato :(';
     }
 }

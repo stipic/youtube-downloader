@@ -14,6 +14,7 @@
 						<h1>{{ fail.youtubeInfo | queueGetTitle }}</h1>
 						URL: <a href="{{ fail.url }}" target="_blank">{{ fail.url }}</a><br />
                         Pokušano preuzimanje: {{ fail.finishedAt | date('d.m.Y H:i:s') }}<br />
+						Desc: {{ runIndexToDesc(fail) }}
 					</li>
 					<hr>
 				{% endfor %}

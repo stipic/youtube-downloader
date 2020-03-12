@@ -2,7 +2,9 @@
 
 namespace App\Twig;
 
+use App\Entity\Queue;
 use App\Repository\QueueRepository;
+use App\Service\MessageHandler\DownloadMessageHandler;
 use Twig\TwigFilter;
 use Twig\Environment;
 use Twig\Extension\AbstractExtension;
@@ -51,7 +53,7 @@ class TwigFilters extends AbstractExtension
                 [
                     'is_safe' => ['html'],
                 ]
-            )
+            ),
         ];
     }
 
