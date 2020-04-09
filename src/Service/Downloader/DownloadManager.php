@@ -86,6 +86,8 @@ class DownloadManager
 
             $this->_em->persist($notification);
 
+            // provjeri dali user već ima tu pjesmu.
+            
             $user->addSong($song);
             $song->addUser($user);
             $this->_em->persist($user);
@@ -119,8 +121,8 @@ class DownloadManager
             if($ytVideoId == $videoId && $ytVideoTitle != false)
             {
                 $rootDir = $this->_appKernel->getProjectDir();
-                $safeFilename = self::normalizeString($video->snippet->title);
-                $location = $rootDir . '/public/storage/song/' . date('Y') . '/' . date('m') . '/' . date('d') . '/' . date('H') . '/' . date('i') . '/' . $safeFilename . '.mp3';
+
+                $location = $rootDir . '/public/storage/%(title)s.%(ext)s';
                 $videoInfo = json_encode($video);
 
                 $queue = new Queue();

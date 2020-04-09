@@ -22,4 +22,6 @@ yarn-error.log
 .phpunit
 .phpunit.result.cache
 /phpunit.xml
+.vscode
+.env
 ###< symfony/phpunit-bridge ###

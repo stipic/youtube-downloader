@@ -76,12 +76,14 @@ class DownloadMessageHandler implements MessageHandlerInterface
             if(!$song instanceof Song && $user instanceof User)
             {
                 echo "\n\r" . 'DOWNLOAD STARTED ' . $url;
-
                 $process = new Process([
                     'youtube-dl', 
+                    '-f',
+                    'bestaudio[filesize<15M]',
                     '--extract-audio', 
                     '--audio-format',  
                     'mp3', 
+                    '--prefer-ffmpeg',
                     $url, 
                     '--output', 
                     $location, 
@@ -94,7 +96,21 @@ class DownloadMessageHandler implements MessageHandlerInterface
 
                 $process->setTimeout(180); // MAX. 3 minute.
                 $process->start();
-                $process->wait();
+                $process->wait(function ($type, $buffer) use(&$location)
+                {
+                    if (Process::ERR === $type) 
+                    {
+                        echo 'ERR > '.$buffer;
+                    } 
+                    else 
+                    {
+                        $delmiter = "[ffmpeg] Destination: ";
+                        if(strpos($buffer, $delmiter) !== false) 
+                        {
+                            $location = trim(str_replace($delmiter, '', $buffer));
+                        }
+                    }
+                });
 
                 if($this->_fileSystem->exists($location))
                 {
